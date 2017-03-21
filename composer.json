@@ -1,0 +1,21 @@
+{
+    "name": "bangerkuwranger/magento-2-coupon-code-api",
+    "description": "API Methods for generating a coupon code for a given cart rule",
+    "require": {
+        "php": "~5.5.0|~5.6.0|~7.0.0"
+    },
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+ "extra": {
+        "map": [
+            [
+                "*",
+                "Bangerkuwranger/Couponcodeapi"
+            ]
+        ]
+    }
+}
