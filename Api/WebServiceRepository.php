@@ -1,5 +1,5 @@
 <?php
-namespace Bangerkuwranger\Couponcodeapi\Model\Resource;
+namespace Bangerkuwranger\Couponcodeapi\Api;
 use Bangerkuwranger\Couponcodeapi\Api\WebServiceRepositoryInterface;
 use Magento\SalesRule\Api\RuleRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
@@ -7,7 +7,7 @@ use Magento\Framework\App\ResourceConnectionFactory;
 use Magento\Customer\Model\CustomerFactory;
 /**
  * Class WebServiceRepository
- * @package Bangerkuwranger\Couponcodeapi\Model
+ * @package Bangerkuwranger\Couponcodeapi\Api
  */
 class WebServiceRepository implements WebServiceRepositoryInterface {
 
@@ -48,7 +48,7 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
     /**
      * @return mixed
      */
-    public function getCartRule( $ruleId, $returnObj = false; ) {
+    public function getCartRule( $ruleId, $returnObj = false ) {
     
         $rule = $this->_rules->getById( $ruleId );
         if( $returnObj ) {
@@ -182,7 +182,7 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
     
     public function getCustIdByEmail( $email ) {
     
-    	id = null;
+    	$id = null;
     	try {
     	
     		$cust = $this->_custs->get( $email );
