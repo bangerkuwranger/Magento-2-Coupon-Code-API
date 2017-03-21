@@ -12,7 +12,6 @@ interface WebServiceRepositoryInterface {
      * @return mixed
      */
     public function getCartRule( $ruleId );
-    
     /**
      * @param int $ruleId
      * @param int $custId
@@ -23,7 +22,6 @@ interface WebServiceRepositoryInterface {
      * @return string
      */
     public function getCouponCode( $ruleId, $custId, $qty, $length, $format );
-    
     /**
 	 * @param string $email
 	 *
