@@ -59,8 +59,8 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
         	"usesPerCust"		=> $rule->getUsesPerCustomer(),
         	"usesPerCoupon"		=> $rule->getUsesPerCoupon(),
         	"isActive"			=> ( $rule->getIsActive() ) ? true : false,
-        	"conditions"		=> $rule->getConditionsSerialized(),
-        	"actions"			=> $rule->getActionsSerialized(),
+        	"conditions"		=> $rule->getConditions(),
+        	"actions"			=> $rule->getActions(),
         	"customerGroups"	=> $rule->getCustomerGroupIds(),
         	"storeLabel"		=> $rule->getStoreLabel(),
         );
