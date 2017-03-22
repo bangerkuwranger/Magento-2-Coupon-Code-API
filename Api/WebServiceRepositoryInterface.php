@@ -9,11 +9,11 @@ interface WebServiceRepositoryInterface {
     /**
 	 * @param int $ruleId
 	 *
-     * @return mixed
+     * @return \stdClass
      */
     public function getCartRule( $ruleId );
     /**
-     * @param int $ruleId
+     * @param int $ruleId     
      * @param int $custId
      * @param int $qty
      * @param int $length

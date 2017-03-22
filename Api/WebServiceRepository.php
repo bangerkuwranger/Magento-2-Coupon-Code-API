@@ -2,9 +2,12 @@
 namespace Bangerkuwranger\Couponcodeapi\Api;
 use Bangerkuwranger\Couponcodeapi\Api\WebServiceRepositoryInterface;
 use Magento\SalesRule\Api\RuleRepositoryInterface;
+use Magento\SalesRule\Model\RuleFactory;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\ResourceConnectionFactory;
 use Magento\Customer\Model\CustomerFactory;
+use Magento\SalesRule\Model\CouponFactory;
+use Magento\SalesRule\Model\Coupon\CodegeneratorFactory;
 /**
  * Class WebServiceRepository
  * @package Bangerkuwranger\Couponcodeapi\Api
@@ -20,6 +23,10 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
      */
     protected $_rules;
     /**
+     * @var RuleFactory
+     */
+    protected $_ruleFactory;
+    /**
      * @var CustomerRepositoryInterface
      */
     protected $_custs; 
@@ -28,20 +35,31 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
      */
     protected $_custFactory;
     /**
+     * @var CouponFactory
+     */
+    protected $_couponFactory;
+     /**
+     * @var CodegeneratorFactory
+     */
+    protected $_codegenFactory;
+    /**
      * WebServiceRepository constructor.
      *
      * @param ResourceConnectionFactory $_resourceConnection
      */
-    public function __construct( ResourceConnectionFactory $_resourceConnection, RuleRepositoryInterface $_rules, CustomerRepositoryInterface $_custs, CustomerFactory $_custFactory ) {
+    public function __construct( ResourceConnectionFactory $_resourceConnection, RuleRepositoryInterface $_rules, RuleFactory $_ruleFactory, CustomerRepositoryInterface $_custs, CustomerFactory $_custFactory, CouponFactory $_couponFactory, CodegeneratorFactory $_codegenFactory ) {
     
         $this->_resourceConnection = $_resourceConnection;
         $this->_rules = $_rules;
+        $this->_ruleFactory = $_ruleFactory;
         $this->_custs = $_custs;
         $this->_custFactory = $_custFactory;
+        $this->_couponFactory = $_couponFactory;
+        $this->_codegenFactory = $_codegenFactory;
     
     }
     /**
-     * @return mixed
+     * @return \stdClass
      */
     public function getCartRule( $ruleId, $returnObj = false ) {
     
@@ -51,127 +69,66 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
         	return $rule;
         
         }
-        $ruleData = array(
-        	"name"				=> $rule->getName(),
-        	"description"		=> $rule->getDescription(),
-        	"fromDate"			=> $rule->getFromDate(),
-        	"toDate"			=> $rule->getToDate(),
-        	"usesPerCust"		=> $rule->getUsesPerCustomer(),
-        	"usesPerCoupon"		=> $rule->getUsesPerCoupon(),
-        	"isActive"			=> ( $rule->getIsActive() ) ? true : false,
-        	"conditions"		=> $rule->getConditions(),
-        	"actions"			=> $rule->getActions(),
-        	"customerGroups"	=> $rule->getCustomerGroupIds(),
-        	"storeLabel"		=> $rule->getStoreLabel(),
+        $ruleData =  array(
+        	"name"				=> $rule->getName(),							//[0](string)
+        	"description"		=> $rule->getDescription(),						//[1](string)
+        	"fromDate"			=> $rule->getFromDate(),						//[2](string){YYYY-MM-DD}
+        	"toDate"			=> $rule->getToDate(),							//[3](string){YYYY-MM-DD}
+        	"usesPerCust"		=> intval( $rule->getUsesPerCustomer() ),		//[4](int)
+        	"usesPerCoupon"		=> intval( $rule->getUsesPerCoupon() ),			//[5](int)
+        	"isActive"			=> ( $rule->getIsActive() ) ? true : false,		//[6](bool)
+        	"customerGroups"	=> $rule->getCustomerGroupIds(),				//[7](array)[string-groupid]
         );
+        
+// 		$ruleData = new \stdClass();
+// 		$ruleData->name = $rule->getName();
+// 		$ruleData->description = $rule->getDescription();
+// 		$ruleData->fromDate = $rule->getFromDate();
+// 		$ruleData->toDate = $rule->getToDate();
+// 		$ruleData->usesPerCust = intval( $rule->getUsesPerCustomer() );
+// 		$ruleData->usesPerCoupon = intval( $rule->getUsesPerCoupon() );
+// 		$ruleData->isActive = ( $rule->getIsActive() ) ? true : false;
+// 		$ruleData->customerGroups = $rule->getCustomerGroupIds();
+		
         return $ruleData;
    
     }
     /**
      * @return string
      */
-    public function getCouponCode( $ruleId, $custId = null, $email = null, $fname = null, $lname = null, $qty = 1, $length = 10, $format = 'alphanum' ) {
+    public function getCouponCode( $ruleId, $custId = null, $qty = 1, $length = 10, $format = 'alphanum' ) {
 		
-		$rule = $this->getCartRule( $ruleId, true );
-		if( null !== $custId ) {
+		$rule = $this->_ruleFactory->create()->load( $ruleId );
+		$ruleGroups = $rule->getCustomerGroupIds();
+		$custGroup = array();
+		$custNotRequired = true;
+		if( null !== $custId && $custId ) {
 		
 			$cust = $this->_custs->getById( $custId );
+			$custGroup = $cust->getGroupId();
 		
 		}
-		elseif( null !== $email ) {
+		if( $custNotRequired || in_array( $custGroup, $ruleGroups, true ) ) {
 		
-			$websiteId = $this->_storeManager->getWebsite()->getWebsiteId();
-			$cust = $this->_custFactory->create();
-			$cust->setWebsiteId( $websiteId );
-			$cust->setEmail( $email );
-			if( null !== $fname ) {
-			
-				$cust->setFirstname( $fname );
-			
-			}
-			if( null !== $lname ) {
-			
-				$cust->setLastname( $lname );
-			
-			}
-			$cust->setPassword( $cust->generatePassword( 8 ) );
-			try {
-			
-				$cust->save();
-				$cust->sendNewAccountEmail();
-			
-			}
-			catch( \Exception $e ) {
-			
-				if( $e instanceof \Magento\Framework\Exception\LocalizedException || $cust->getId() ) {
-				
-					throw $e;
-				
-				}
-			
-			}
+			$rule->setCouponType( 3 );
+			$rule->save();
+			$newCoupon = $rule->acquireCoupon( true, 1 );
+			$newCoupon->setType( 1 );
+			$newCoupon->setCreatedAt( date( 'Y-m-d h:i:s' ) );
+			$newCoupon->setExpirationDate( null );
+			$newCoupon->setTimesUsed( 0 );
+			$newCoupon->save();
+			$rule->setCouponType( 2 );
+			$rule->setUseAutoGeneration( 1 );
+			$rule->save();
+			return $newCoupon->getCode();
 		
 		}
-		$custGroup = $cust->getGroupId();
-		$ruleGroups = $rule->getCustomerGroupIds();
-		$custInRuleGroup = in_array( $custGroup, $ruleGroups, true );
-		//logic from Magento\SalesRule\Model\Rule->aquireCoupon... but returns actual code if autogenerating.
-		if( $coupon->getCouponType() == 1 ) {
+		else {
 		
-            return null;
-        
-        }
-        if( $this->getCouponType() == 2 ) {
-        
-            return $this->getPrimaryCoupon();
-        
-        }
-        /** @var \Magento\SalesRule\Model\Coupon $coupon */
-        $coupon = $this->_couponFactory->create();
-        $coupon->setRule(
-            $this
-        )->setIsPrimary(
-            false
-        )->setUsageLimit(
-            $this->getUsesPerCoupon() ? $this->getUsesPerCoupon() : null
-        )->setUsagePerCustomer(
-            $this->getUsesPerCustomer() ? $this->getUsesPerCustomer() : null
-        )->setExpirationDate(
-            $this->getToDate()
-        );
-
-        $couponCode = $rule->getCouponCodeGenerator()->generateCode();
-        $coupon->setCode( $couponCode );
-
-        $ok = false;
-		if( $coupon->getId() ) {
-		
-			try {
-			
-				$coupon->save();
-			
-			}
-			catch (\Exception $e) {
-			
-				if( $e instanceof \Magento\Framework\Exception\LocalizedException || $coupon->getId() ) {
-				
-					throw $e;
-				
-				}
-				$couponCode = $couponCode . $rule->getCouponCodeGenerator()->getDelimiter() . sprintf( '%04u', rand( 0, 9999 ) );
-				$coupon->setCode( $couponCode );
-			
-			}
-			$ok = true;
+			throw new \Magento\Framework\Exception\LocalizedException(__('Customer is not in group for this discount'));
 		
 		}
-        if( !$ok ) {
-        
-            throw new \Magento\Framework\Exception\LocalizedException(__('Can\'t acquire coupon.'));
-        
-        }
-
-        return $couponCode;
     
     }
     
