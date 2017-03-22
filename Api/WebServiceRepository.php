@@ -23,10 +23,6 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
      * @var CustomerRepositoryInterface
      */
     protected $_custs; 
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $_storeManager;
      /**
      * @var CustomerFactory
      */
@@ -36,7 +32,7 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
      *
      * @param ResourceConnectionFactory $_resourceConnection
      */
-    public function __construct( ResourceConnectionFactory $_resourceConnection, RuleRepositoryInterface $_rules, CustomerRepositoryInterface $_custs, StoreManagerInterface $_storeManager, CustomerFactory $_custFactory ) {
+    public function __construct( ResourceConnectionFactory $_resourceConnection, RuleRepositoryInterface $_rules, CustomerRepositoryInterface $_custs, CustomerFactory $_custFactory ) {
     
         $this->_resourceConnection = $_resourceConnection;
         $this->_rules = $_rules;
