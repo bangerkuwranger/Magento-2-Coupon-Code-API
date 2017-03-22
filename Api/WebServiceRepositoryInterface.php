@@ -15,13 +15,10 @@ interface WebServiceRepositoryInterface {
     /**
      * @param int $ruleId     
      * @param int $custId
-     * @param int $qty
-     * @param int $length
-     * @param string $format
      *
      * @return string
      */
-    public function getCouponCode( $ruleId, $custId, $qty, $length, $format );
+    public function getCouponCode( $ruleId, $custId );
     /**
 	 * @param string $email
 	 *

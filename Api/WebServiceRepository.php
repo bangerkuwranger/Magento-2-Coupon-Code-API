@@ -96,7 +96,7 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
     /**
      * @return string
      */
-    public function getCouponCode( $ruleId, $custId = null, $qty = 1, $length = 10, $format = 'alphanum' ) {
+    public function getCouponCode( $ruleId, $custId = null ) {
 		
 		$rule = $this->_ruleFactory->create()->load( $ruleId );
 		$ruleGroups = $rule->getCustomerGroupIds();
