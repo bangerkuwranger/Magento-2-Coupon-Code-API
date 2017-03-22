@@ -37,7 +37,6 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
         $this->_resourceConnection = $_resourceConnection;
         $this->_rules = $_rules;
         $this->_custs = $_custs;
-        $this->_storeManager = $_storeManager;
         $this->_custFactory = $_custFactory;
     
     }
