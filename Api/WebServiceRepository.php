@@ -89,6 +89,7 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
 // 		$ruleData->usesPerCoupon = intval( $rule->getUsesPerCoupon() );
 // 		$ruleData->isActive = ( $rule->getIsActive() ) ? true : false;
 // 		$ruleData->customerGroups = $rule->getCustomerGroupIds();
+//someday.... actually, probably want to make another interface for this, and implement setters/getters for SOAPy folk
 		
         return $ruleData;
    
@@ -101,7 +102,7 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
 		$rule = $this->_ruleFactory->create()->load( $ruleId );
 		$ruleGroups = $rule->getCustomerGroupIds();
 		$custGroup = array();
-		$custNotRequired = true;
+		$custNotRequired = ( null === $custId || 0 === $custId );
 		if( null !== $custId && $custId ) {
 		
 			$cust = $this->_custs->getById( $custId );
