@@ -29,16 +29,16 @@ Anyhow, once installed, there will be three endpoints available:
 
 The third one is the only really necessary endpoint; it's what actually generates the code for your Cart Price Rule. The other two are useful if you want to verify the Cart Rule's ID and the customer ID. All three methods require authentication of some sort; make sure to familiarize yourself with the [Magento API Authentication process](http://devdocs.magento.com/guides/v2.1/get-started/authentication/gs-authentication.html) so your logic incorporates the proper authentication steps. Once that's take care of, you can generate the code by making an API request to the getCouponCode endpoint, and you'll get a new coupon code back.
 
-##Recommended Logic Flows
+## Recommended Logic Flows
 
-###Without Customer Group Validation
+### Without Customer Group Validation
 
 1. Perform authentication to Magento API
 2. Request information about the Cart Rule from the API (getCartRule).
 3. Verify that Cart Rule details match as expected.
 4. Create a new Coupon Code for the Cart Rule using ruleId and setting custId to 0. (getCouponCode)
 
-###With Customer Group Authentication
+### With Customer Group Authentication
 
 1. Perform authentication to Magento API
 2. Request information about the Cart Rule from the API (getCartRule).
@@ -47,29 +47,29 @@ The third one is the only really necessary endpoint; it's what actually generate
 5. If cust exists, continue. If not, you can create customer using Magento's built in API methods if that makes sense for your workflow.
 6. Create a new Coupon Code for the Cart Rule using ruleId and custId (getCouponCode)
 
-#Endpoint Documentation
+# Endpoint Documentation
 
-##/bangerkuwranger/couponcode/getCartRule/
+## /bangerkuwranger/couponcode/getCartRule/
 
-###Description
+### Description
 
 Given a cart rule id, this method returns an array of values from the cart rule if the rule exists, or an error if it does not exist or something else went wrong with the API transaction.
 
-###Example
+### Example
 
 `curl -X GET "https://magento.host/index.php/rest/V1//bangerkuwranger/couponcode/getCartRule/?ruleId=20" -H “Content-Type: application/json” -H "Authorization: Bearer vbnf3hjklp5iuytre" `
 
-###Method
+### Method
 
 GET
 
-###Request *Query String* Parameters
+### Request *Query String* Parameters
 
 `int $ruleId unique identifier for magento cart discount rule`
 
-###Successful Response
+### Successful Response
 
-####Format
+#### Format
 
 	[
 		[0] (string): name,
@@ -86,13 +86,13 @@ GET
 			]
 	]
 
-###HTTP 400 Response
+### HTTP 400 Response
 
-####Reason
+#### Reason
 
 Bad Request
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -117,13 +117,13 @@ Bad Request
 		fieldValue (string, optional): Incorrect field value
 	}
 
-###HTTP 401 Response
+### HTTP 401 Response
 
-####Reason
+#### Reason
 
 Not Authorized / Invalid Token
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -148,13 +148,13 @@ Not Authorized / Invalid Token
 		fieldValue (string, optional): Incorrect field value
 	}
 
-###HTTP 500 Response
+### HTTP 500 Response
 
-####Reason
+#### Reason
 
 Server Error / Local Exception
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -179,37 +179,37 @@ Server Error / Local Exception
 		fieldValue (string, optional): Incorrect field value
 	}
 
-##/bangerkuwranger/couponcode/getCustIdByEmail/
+## /bangerkuwranger/couponcode/getCustIdByEmail/
 
-###Description
+### Description
 
 Given an email address, this method returns a unique identifier for the magento customer, or an error if it does not exist or something else went wrong with the API transaction.
 
-###Example
+### Example
 
 `curl -X POST "https://magento.host/index.php/rest/V1//bangerkuwranger/couponcode/getCustIdByEmail/" -H “Content-Type: application/json” -H "Authorization: Bearer vbnf3hjklp5iuytre" -d '{"email":"customer1@example.com"}'`
 
-###Method
+### Method
 
 POST
 
-###Request *Body* Parameters
+### Request *Body* Parameters
 
 `string $email email address to search for customer with`
 
-###Successful Response
+### Successful Response
 
-####Format
+#### Format
 
 `(string) “custId”`
 
-###HTTP 400 Response
+### HTTP 400 Response
 
-####Reason
+#### Reason
 
 Bad Request
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -234,13 +234,13 @@ Bad Request
 		fieldValue (string, optional): Incorrect field value
 	}
 
-###HTTP 401 Response
+### HTTP 401 Response
 
-####Reason
+#### Reason
 
 Not Authorized / Invalid Token
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -265,13 +265,13 @@ Not Authorized / Invalid Token
 		fieldValue (string, optional): Incorrect field value
 	}
 
-###HTTP 500 Response
+### HTTP 500 Response
 
-####Reason
+#### Reason
 
 Server Error / Local Exception
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -296,39 +296,39 @@ Server Error / Local Exception
 		fieldValue (string, optional): Incorrect field value
 	}
 
-##/bangerkuwranger/couponcode/getCouponCode/
+## /bangerkuwranger/couponcode/getCouponCode/
 
-###Description
+### Description
 
 Given a cart rule id and customer id (use the number zero if customer id is not being used), this method returns a unique coupon code for the magento cart rule, or an error if it does not exist or something else went wrong with the API transaction. If customer id is being used, this will check if customer belongs to a group that can use the coupon code first, returning an error if customer is not authorized.
 
-###Example
+### Example
 
 `curl -X POST "https://magento.host/index.php/rest/V1//bangerkuwranger/couponcode/getCouponCode/" -H “Content-Type: application/json” -H "Authorization: Bearer vbnf3hjklp5iuytre" -d '{"ruleId":31,”custId”:1055}'`
 
-###Method
+### Method
 
 POST
 
-###Request *Body* Parameters
+### Request *Body* Parameters
 
 `int $ruleId unique identifier for magento cart discount rule`
 `int $custId unique identifier for magento customer`
 
 
-###Successful Response
+### Successful Response
 
-####Format
+#### Format
 
 `(string) “couponCode”`
 
-###HTTP 400 Response
+### HTTP 400 Response
 
-####Reason
+#### Reason
 
 Bad Request
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -353,13 +353,13 @@ Bad Request
 		fieldValue (string, optional): Incorrect field value
 	}
 
-###HTTP 401 Response
+### HTTP 401 Response
 
-####Reason
+#### Reason
 
 Not Authorized / Invalid Token
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
@@ -384,13 +384,13 @@ Not Authorized / Invalid Token
 		fieldValue (string, optional): Incorrect field value
 	}
 
-###HTTP 500 Response
+### HTTP 500 Response
 
-####Reason
+#### Reason
 
 Server Error / Local Exception
 
-####Format
+#### Format
 
 	error-response {
 		message (string): Error message ,
