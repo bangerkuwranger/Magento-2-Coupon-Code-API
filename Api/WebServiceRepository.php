@@ -146,12 +146,14 @@ class WebServiceRepository implements WebServiceRepositoryInterface {
     	
     		if( $e instanceof \Magento\Framework\Exception\NoSuchEntityException ) {
     		
-    			return $e;
+    			return 'No customer record exists for this email address.';
     		
     		}
     		else {
     		
-    			throw $e;
+    			return array(
+    				"error"	=> $e
+    			);
     		
     		}
     	
